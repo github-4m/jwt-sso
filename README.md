@@ -25,13 +25,8 @@ JWT_DB_PASSWORD=local                             // your database password
 JWT_CAS_HOST=https://cas.local                    // your CAS host
 JWT_CAS_SERVICE=http://localhost:8080/api/login
 ```
-
-If you want to use embedded Jetty, run the command below inside the project directory
+Run the command below inside the project directory
 ```
 $ mvn clean spring-boot:run
 ```
-
-If you want to use others container, create the .war file and deploy to the container
-```
-$ mvn clean install
-```
+or create the .war file then deploy it to others container

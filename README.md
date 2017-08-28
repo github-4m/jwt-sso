@@ -14,7 +14,7 @@ Please make sure your environment have dependecies below :
 ## Installation and How To Use
 You can choose to use embedded Jetty or others container (e.g. Apache Tomcat) to run the project.
 Please set the value of environment variables below
-{code}
+```
 JWT_DB_HOST=localhost // your database host
 JWT_DB_PORT=5432 // your database port
 JWT_DB_NAME=jwt_sso // your database name
@@ -23,4 +23,4 @@ JWT_DB_PASSWORD=local // your database password
 
 JWT_CAS_HOST=https://cas.local // your CAS host
 JWT_CAS_SERVICE=http://localhost:8080/api/login
-{code}
+```

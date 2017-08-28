@@ -33,4 +33,4 @@ $ mvn clean spring-boot:run
 or create the .war file then deploy it to others container
 
 ### How To Use
-To see all your controller in browser you can access this url ../swagger-ui.html
+To access all API in this project you should include the token, which generated after login, in request header. Put the token in "Authorization" request header. Some API will ignored from security (no need to include token in request header), e.g. /api/login, /swagger-ui.html

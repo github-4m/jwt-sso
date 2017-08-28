@@ -1,17 +1,11 @@
 package id.co.blogspot.fathan.controller.authentication;
 
-import id.co.blogspot.fathan.dto.AuthenticateRequest;
 import id.co.blogspot.fathan.dto.BaseResponse;
-import id.co.blogspot.fathan.dto.RegisterRequest;
 import id.co.blogspot.fathan.dto.SingleBaseResponse;
-import id.co.blogspot.fathan.entity.User;
 import id.co.blogspot.fathan.service.user.UserService;
-import id.co.blogspot.fathan.util.Precondition;
-import org.springframework.beans.BeanUtils;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,54 +21,18 @@ public class AuthenticationController {
   @Autowired
   private UserService userService;
 
-  private User generateUser(RegisterRequest request) throws Exception {
-    User user = new User();
-    BeanUtils.copyProperties(request, user);
-    return user;
-  }
-
-  @RequestMapping(
-      value = AuthenticationControllerPath.LOGIN,
-      method = RequestMethod.POST,
-      consumes = {MediaType.APPLICATION_JSON_VALUE}
-  )
+  @RequestMapping(value = AuthenticationControllerPath.LOGIN, method = RequestMethod.GET, produces = {
+      MediaType.APPLICATION_JSON_VALUE})
   public SingleBaseResponse<String> authenticate(
-      @RequestParam String requestId, @RequestBody AuthenticateRequest request) throws Exception {
-    Precondition.checkArgument(
-        !StringUtils.isEmpty(request.getUsername()),
-        AuthenticationControllerErrorMessage.USERNAME_MUST_NOT_BE_BLANK);
-    Precondition.checkArgument(
-        !StringUtils.isEmpty(request.getPassword()),
-        AuthenticationControllerErrorMessage.PASSWORD_MUST_NOT_BE_BLANK);
-    String jwtToken = this.userService.authenticate(request.getUsername(), request.getPassword());
+      @RequestParam(required = false) String requestId, @RequestParam(required = false) String ticket,
+      HttpServletResponse httpServletResponse)
+      throws Exception {
+    String jwtToken = this.userService.authenticate(ticket, httpServletResponse);
     return new SingleBaseResponse<String>(null, null, true, requestId, jwtToken);
   }
 
-  @RequestMapping(
-      value = AuthenticationControllerPath.SIGNUP,
-      method = RequestMethod.POST,
-      consumes = {MediaType.APPLICATION_JSON_VALUE}
-  )
-  public BaseResponse register(@RequestParam String requestId, @RequestBody RegisterRequest request)
-      throws Exception {
-    Precondition.checkArgument(
-        !StringUtils.isEmpty(request.getUsername()),
-        AuthenticationControllerErrorMessage.USERNAME_MUST_NOT_BE_BLANK);
-    Precondition.checkArgument(
-        !StringUtils.isEmpty(request.getPassword()),
-        AuthenticationControllerErrorMessage.PASSWORD_MUST_NOT_BE_BLANK);
-    Precondition.checkArgument(
-        !StringUtils.isEmpty(request.getName()),
-        AuthenticationControllerErrorMessage.NAME_MUST_NOT_BE_BLANK);
-    Precondition.checkArgument(
-        !StringUtils.isEmpty(request.getEmail()),
-        AuthenticationControllerErrorMessage.EMAIL_MUST_NOT_BE_BLANK);
-    User user = this.generateUser(request);
-    this.userService.register(user);
-    return new BaseResponse(null, null, true, requestId);
-  }
-
-  @RequestMapping(value = AuthenticationControllerPath.LOGOUT, method = RequestMethod.GET)
+  @RequestMapping(value = AuthenticationControllerPath.LOGOUT, method = RequestMethod.GET, produces = {
+      MediaType.APPLICATION_JSON_VALUE})
   public BaseResponse unauthenticate(@RequestParam String requestId) throws Exception {
     this.userService.unauthenticate();
     return new BaseResponse(null, null, true, requestId);

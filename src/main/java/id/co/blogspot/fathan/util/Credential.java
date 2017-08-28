@@ -1,6 +1,7 @@
 package id.co.blogspot.fathan.util;
 
 import org.slf4j.MDC;
+import org.springframework.util.StringUtils;
 
 /**
  * Created by fathan.mustaqiim on 10/27/2016.
@@ -11,6 +12,7 @@ public final class Credential {
   public static final String CREDENTIAL_SESSION_ID = "SESSION_ID";
   public static final String CREDENTIAL_HOSTNAME = "HOSTNAME";
   public static final String CREDENTIAL_REQUEST_ID = "REQUEST_ID";
+  public static final String CREDENTIAL_ROLES = "ROLES";
 
   private Credential() {
   }
@@ -45,5 +47,13 @@ public final class Credential {
 
   public static void setRequestId(String requestId) {
     MDC.put(Credential.CREDENTIAL_REQUEST_ID, requestId);
+  }
+
+  public static String[] getRoles() {
+    return StringUtils.commaDelimitedListToStringArray(MDC.get(Credential.CREDENTIAL_ROLES));
+  }
+
+  public static void setRoles(String[] roles) {
+    MDC.put(Credential.CREDENTIAL_ROLES, StringUtils.arrayToCommaDelimitedString(roles));
   }
 }

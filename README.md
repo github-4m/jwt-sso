@@ -78,4 +78,9 @@ public String generateJwtToken(String username) throws Exception {
 ```
 
 ## How It Works
+### Authentication
 ![alt text](https://lh3.googleusercontent.com/TtdOxSicBd02Ekfu6CvgHvGChtIw8KKQa2eFlwSOeqAdMknIyew4D_5Ali6a9_N2AwtlhdgF9V6MJl5RM3LzsN6dYUDl0oOBNuEXomCoWypvxp_hESBX0EbCJWBflfRGNdWcfuG75Q=w961-h361-no)
+As you can see from authentication sequence diagram above, any authentication process will provided by CAS server (login form and user authentication) and we don't need to manage user data. But we do manage token generation after authentication process and token validation each time our protected API called
+
+### Authorization
+Authorization process in this project using AOP (Aspect Oriented Programming), so when any method which have @Authorization annotation called, it will validate user roles first

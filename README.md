@@ -13,6 +13,7 @@ Please make sure your environment have dependecies below :
 </ul>
 
 ## Installation and How To Use
+### Installation
 You can choose to use embedded Jetty or others container (e.g. Apache Tomcat) to run the project.
 Please set the value of environment variables below
 ```
@@ -30,3 +31,6 @@ Run the command below inside the project directory
 $ mvn clean spring-boot:run
 ```
 or create the .war file then deploy it to others container
+
+### How To Use
+To see all your controller in browser you can access this url ../swagger-ui.html

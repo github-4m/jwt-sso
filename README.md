@@ -7,7 +7,7 @@ Please make sure your environment have dependecies below :
 <ul>
 <li>Java (version 8.x or higher)</li>
 <li>Apache Maven (version 3.x.x or higher)</li>
-<li>sql database (Postgres or others, need to change database driver in project properties if you use others)</li>
+<li>SQL database (Postgres or others, need to change database driver in project properties if you use others)</li>
 <li>Central Authentication Service</li>
 <li>Java container (e.g. Tomcat, optional)</li>
 </ul>

@@ -67,7 +67,7 @@ public String authenticate(String ticket, HttpServletResponse httpServletRespons
 public String generateJwtToken(String username) throws Exception {
   Claims claims = Jwts.claims().setSubject(username);
   // put your code here :
-  // put user roles to claims object
+  // put user roles in claims object
   claims.put("sessionId", Credential.getSessionId());
   return Jwts.builder()
       .setClaims(claims)

@@ -2,7 +2,7 @@ package id.co.blogspot.fathan.outbound.cas;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import id.co.blogspot.fathan.dto.cas.CasAuthenticationSuccess;
-import id.co.blogspot.fathan.dto.cas.CasResponse;
+import id.co.blogspot.fathan.dto.cas.CasServiceResponse;
 import id.co.blogspot.fathan.outbound.HttpInvoker;
 import id.co.blogspot.fathan.security.exception.UnauthorizedException;
 import java.net.URI;
@@ -44,10 +44,16 @@ public class CasOutboundBean implements CasOutbound {
     URI uri = new URIBuilder(this.casHost).setPath(CasOutboundPath.VALIDATE).addParameter("service", this.casService)
         .addParameter("ticket", ticket).build();
     String responseBody = this.httpInvoker.invoke(uri, HttpMethod.GET, null);
-    CasResponse casResponse = this.xmlMapper.readValue(responseBody, CasResponse.class);
-    if (!StringUtils.isEmpty(casResponse.getCasAuthenticationFailure())) {
+    CasServiceResponse casServiceResponse = this.xmlMapper.readValue(responseBody, CasServiceResponse.class);
+    if (!StringUtils.isEmpty(casServiceResponse.getCasAuthenticationFailure())) {
       throw new UnauthorizedException("Unauthorized api access");
     }
-    return casResponse.getCasAuthenticationSuccess();
+    return casServiceResponse.getCasAuthenticationSuccess();
+  }
+
+  @Override
+  public void unauthenticate(HttpServletResponse httpServletResponse) throws Exception {
+    URI uri = new URIBuilder(this.casHost).setPath(CasOutboundPath.UNAUTHENTICATE).build();
+    httpServletResponse.sendRedirect(uri.toString());
   }
 }

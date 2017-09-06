@@ -1,7 +1,7 @@
 package id.co.blogspot.fathan.outbound.cas;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import id.co.blogspot.fathan.dto.cas.CasResponse;
+import id.co.blogspot.fathan.dto.cas.CasServiceResponse;
 import id.co.blogspot.fathan.outbound.HttpInvoker;
 import id.co.blogspot.fathan.security.exception.UnauthorizedException;
 import java.net.URI;
@@ -39,9 +39,9 @@ public class CasOutboundTest {
   @InjectMocks
   private CasOutboundBean casOutboundBean;
 
-  private CasResponse generateCasResponse() throws Exception {
-    CasResponse casResponse = new CasResponse();
-    return casResponse;
+  private CasServiceResponse generateCasServiceResponse() throws Exception {
+    CasServiceResponse casServiceResponse = new CasServiceResponse();
+    return casServiceResponse;
   }
 
   @Before
@@ -49,11 +49,12 @@ public class CasOutboundTest {
     MockitoAnnotations.initMocks(this);
     ReflectionTestUtils.setField(this.casOutboundBean, "casHost", CasOutboundTest.DEFAULT_CAS_HOST);
     ReflectionTestUtils.setField(this.casOutboundBean, "casService", CasOutboundTest.DEFAULT_CAS_SERVICE);
-    CasResponse casResponse = this.generateCasResponse();
+    CasServiceResponse casServiceResponse = this.generateCasServiceResponse();
     Mockito.doNothing().when(this.httpServletResponse).sendRedirect(Mockito.anyString());
     Mockito.when(this.httpInvoker.invoke(Mockito.any(URI.class), Mockito.any(HttpMethod.class), Mockito.anyString()))
         .thenReturn(CasOutboundTest.DEFAULT_CAS_RESPONSE);
-    Mockito.when(this.xmlMapper.readValue(Mockito.anyString(), Mockito.any(Class.class))).thenReturn(casResponse);
+    Mockito.when(this.xmlMapper.readValue(Mockito.anyString(), Mockito.any(Class.class)))
+        .thenReturn(casServiceResponse);
   }
 
   @After
@@ -78,9 +79,10 @@ public class CasOutboundTest {
 
   @Test(expected = UnauthorizedException.class)
   public void validateWithUnauthorizedExceptionTest() throws Exception {
-    CasResponse casResponse = new CasResponse();
-    casResponse.setCasAuthenticationFailure("Unauthorized api access");
-    Mockito.when(this.xmlMapper.readValue(Mockito.anyString(), Mockito.any(Class.class))).thenReturn(casResponse);
+    CasServiceResponse casServiceResponse = new CasServiceResponse();
+    casServiceResponse.setCasAuthenticationFailure("Unauthorized api access");
+    Mockito.when(this.xmlMapper.readValue(Mockito.anyString(), Mockito.any(Class.class)))
+        .thenReturn(casServiceResponse);
     try {
       this.casOutboundBean.validate(CasOutboundTest.DEFAULT_CAS_SESSION_TICKET);
     } catch (Exception e) {
@@ -93,6 +95,12 @@ public class CasOutboundTest {
         Assert.assertFalse(true);
       }
     }
+  }
+
+  @Test
+  public void unauthenticateTest() throws Exception {
+    this.casOutboundBean.unauthenticate(this.httpServletResponse);
+    Mockito.verify(this.httpServletResponse).sendRedirect(Mockito.anyString());
   }
 
 }

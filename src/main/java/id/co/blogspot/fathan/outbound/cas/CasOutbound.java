@@ -12,4 +12,6 @@ public interface CasOutbound {
 
   CasAuthenticationSuccess validate(String ticket) throws Exception;
 
+  void unauthenticate(HttpServletResponse httpServletResponse) throws Exception;
+
 }

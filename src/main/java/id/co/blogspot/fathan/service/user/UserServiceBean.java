@@ -38,7 +38,7 @@ public class UserServiceBean implements UserService {
       this.casOutbound.authenticate(httpServletResponse);
     }
     CasAuthenticationSuccess casAuthenticationSuccess = this.casOutbound.validate(ticket);
-    this.sessionService.create(casAuthenticationSuccess.getUsername());
+    this.sessionService.create(casAuthenticationSuccess.getUsername(), ticket);
     return this.generateJwtToken(casAuthenticationSuccess.getUsername());
   }
 
@@ -63,7 +63,13 @@ public class UserServiceBean implements UserService {
 
   @Override
   @Transactional(readOnly = false, rollbackFor = Exception.class)
-  public void unauthenticate() throws Exception {
-    this.sessionService.remove();
+  public void unauthenticate(String ticket) throws Exception {
+    this.sessionService.remove(ticket);
+  }
+
+  @Override
+  @Transactional(readOnly = false, rollbackFor = Exception.class)
+  public void unauthenticate(HttpServletResponse httpServletResponse) throws Exception {
+    this.casOutbound.unauthenticate(httpServletResponse);
   }
 }

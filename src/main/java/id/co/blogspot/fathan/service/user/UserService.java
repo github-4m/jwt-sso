@@ -14,5 +14,7 @@ public interface UserService {
 
   Claims parseJwtToken(String jwtToken);
 
-  void unauthenticate() throws Exception;
+  void unauthenticate(String ticket) throws Exception;
+
+  void unauthenticate(HttpServletResponse httpServletResponse) throws Exception;
 }

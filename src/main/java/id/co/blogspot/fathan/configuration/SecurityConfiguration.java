@@ -48,7 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     web.ignoring()
         .antMatchers(
             "/api/login",
-            "/api/signup",
+            "/api/logout",
             "/swagger-ui*",
             "/webjars/springfox-swagger-ui/**",
             "/swagger-resources/**",

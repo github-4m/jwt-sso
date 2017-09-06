@@ -13,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.verification.VerificationMode;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -30,6 +29,9 @@ public class UserServiceTest {
 
   @Mock
   private CasOutbound casOutbound;
+
+  @Mock
+  private HttpServletResponse httpServletResponse;
 
   @InjectMocks
   private UserServiceBean userServiceBean;
@@ -56,8 +58,9 @@ public class UserServiceTest {
     Mockito.doNothing().when(this.casOutbound).authenticate(Mockito.any(HttpServletResponse.class));
     Mockito.doNothing().when(this.casOutbound).authenticate(Mockito.any(HttpServletResponse.class));
     Mockito.when(this.casOutbound.validate(Mockito.anyString())).thenReturn(casAuthenticationSuccess);
-    Mockito.doNothing().when(this.sessionService).create(Mockito.anyString());
-    Mockito.doNothing().when(this.sessionService).remove();
+    Mockito.doNothing().when(this.sessionService).create(Mockito.anyString(), Mockito.anyString());
+    Mockito.doNothing().when(this.sessionService).remove(Mockito.anyString());
+    Mockito.doNothing().when(this.casOutbound).unauthenticate(Mockito.any(HttpServletResponse.class));
   }
 
   @After
@@ -70,7 +73,7 @@ public class UserServiceTest {
   public void authenticateTest() throws Exception {
     this.userServiceBean.authenticate(UserServiceTest.DEFAULT_TICKET, null);
     Mockito.verify(this.casOutbound).validate(Mockito.anyString());
-    Mockito.verify(this.sessionService).create(Mockito.anyString());
+    Mockito.verify(this.sessionService).create(Mockito.anyString(), Mockito.anyString());
   }
 
   @Test
@@ -78,7 +81,7 @@ public class UserServiceTest {
     this.userServiceBean.authenticate(null, null);
     Mockito.verify(this.casOutbound).authenticate(Mockito.any(HttpServletResponse.class));
     Mockito.verify(this.casOutbound).validate(Mockito.anyString());
-    Mockito.verify(this.sessionService).create(Mockito.anyString());
+    Mockito.verify(this.sessionService).create(Mockito.anyString(), Mockito.anyString());
   }
 
   @Test
@@ -93,7 +96,13 @@ public class UserServiceTest {
 
   @Test
   public void unauthenticateTest() throws Exception {
-    this.userServiceBean.unauthenticate();
-    Mockito.verify(this.sessionService).remove();
+    this.userServiceBean.unauthenticate(UserServiceTest.DEFAULT_TICKET);
+    Mockito.verify(this.sessionService).remove(Mockito.anyString());
+  }
+
+  @Test
+  public void unauthenticateCasTest() throws Exception {
+    this.userServiceBean.unauthenticate(this.httpServletResponse);
+    Mockito.verify(this.casOutbound).unauthenticate(Mockito.any(HttpServletResponse.class));
   }
 }

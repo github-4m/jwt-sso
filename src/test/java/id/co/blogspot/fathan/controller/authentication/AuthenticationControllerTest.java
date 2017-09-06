@@ -1,5 +1,6 @@
 package id.co.blogspot.fathan.controller.authentication;
 
+import id.co.blogspot.fathan.dto.cas.CasLogoutRequest;
 import id.co.blogspot.fathan.service.user.UserService;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
@@ -25,12 +26,18 @@ public class AuthenticationControllerTest {
   @InjectMocks
   private AuthenticationController authenticationController;
 
+  private CasLogoutRequest generateCasLogoutRequest() throws Exception {
+    CasLogoutRequest casLogoutRequest = new CasLogoutRequest();
+    return casLogoutRequest;
+  }
+
   @Before
   public void initializeTest() throws Exception {
     MockitoAnnotations.initMocks(this);
     Mockito.when(this.userService.authenticate(Mockito.anyString(), Mockito.any(HttpServletResponse.class)))
         .thenReturn(null);
-    Mockito.doNothing().when(this.userService).unauthenticate();
+    Mockito.doNothing().when(this.userService).unauthenticate(Mockito.anyString());
+    Mockito.doNothing().when(this.userService).unauthenticate(Mockito.any(HttpServletResponse.class));
   }
 
   @After
@@ -46,8 +53,14 @@ public class AuthenticationControllerTest {
   }
 
   @Test
+  public void unauthenticateCallbackTest() throws Exception {
+    this.authenticationController.unauthenticate(this.generateCasLogoutRequest());
+    Mockito.verify(this.userService).unauthenticate(Mockito.anyString());
+  }
+
+  @Test
   public void unauthenticateTest() throws Exception {
-    this.authenticationController.unauthenticate(AuthenticationControllerTest.DEFAULT_REQUEST_ID);
-    Mockito.verify(this.userService).unauthenticate();
+    this.authenticationController.unauthenticate(AuthenticationControllerTest.DEFAULT_REQUEST_ID, null);
+    Mockito.verify(this.userService).unauthenticate(Mockito.any(HttpServletResponse.class));
   }
 }

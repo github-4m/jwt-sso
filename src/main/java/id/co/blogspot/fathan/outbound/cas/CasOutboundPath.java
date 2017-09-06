@@ -7,5 +7,6 @@ public interface CasOutboundPath {
 
   String AUTHENTICATE = "/login";
   String VALIDATE = "/serviceValidate";
+  String UNAUTHENTICATE = "/logout";
 
 }

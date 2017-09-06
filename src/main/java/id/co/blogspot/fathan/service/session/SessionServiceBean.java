@@ -20,7 +20,7 @@ public class SessionServiceBean implements SessionService {
 
   @Override
   @Transactional(readOnly = false, rollbackFor = Exception.class)
-  public void create(String username) throws Exception {
+  public void create(String username, String ticket) throws Exception {
     if (StringUtils.isEmpty(username)) {
       throw new Exception("Invalid username");
     }
@@ -33,6 +33,7 @@ public class SessionServiceBean implements SessionService {
     session.setUsername(username);
     session.setSessionId(Credential.getSessionId());
     session.setHostname(Credential.getHostname());
+    session.setTicket(ticket);
     this.sessionRepository.save(session);
   }
 
@@ -46,10 +47,8 @@ public class SessionServiceBean implements SessionService {
 
   @Override
   @Transactional(readOnly = false, rollbackFor = Exception.class)
-  public void remove() throws Exception {
-    Session session =
-        this.sessionRepository.findByUsernameAndSessionId(
-            Credential.getUsername(), Credential.getSessionId());
+  public void remove(String ticket) throws Exception {
+    Session session = this.sessionRepository.findByTicket(ticket);
     if (session != null) {
       this.sessionRepository.delete(session.getId());
     }

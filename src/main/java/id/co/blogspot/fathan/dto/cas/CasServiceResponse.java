@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @JacksonXmlRootElement(localName = "serviceResponse")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CasResponse implements Serializable {
+public class CasServiceResponse implements Serializable {
 
   @JacksonXmlProperty(localName = "authenticationSuccess")
   private CasAuthenticationSuccess casAuthenticationSuccess;
@@ -18,10 +18,10 @@ public class CasResponse implements Serializable {
   @JacksonXmlProperty(localName = "authenticationFailure")
   private String casAuthenticationFailure;
 
-  public CasResponse() {
+  public CasServiceResponse() {
   }
 
-  public CasResponse(CasAuthenticationSuccess casAuthenticationSuccess, String casAuthenticationFailure) {
+  public CasServiceResponse(CasAuthenticationSuccess casAuthenticationSuccess, String casAuthenticationFailure) {
     this.casAuthenticationSuccess = casAuthenticationSuccess;
     this.casAuthenticationFailure = casAuthenticationFailure;
   }
@@ -44,7 +44,7 @@ public class CasResponse implements Serializable {
 
   @Override
   public String toString() {
-    return "CasResponse{" +
+    return "CasServiceResponse{" +
         "casAuthenticationSuccess=" + casAuthenticationSuccess +
         ", casAuthenticationFailure='" + casAuthenticationFailure + '\'' +
         '}';

@@ -5,9 +5,9 @@ package id.co.blogspot.fathan.service.session;
  */
 public interface SessionService {
 
-  void create(String username) throws Exception;
+  void create(String username, String ticket) throws Exception;
 
   boolean isAuthorized() throws Exception;
 
-  void remove() throws Exception;
+  void remove(String ticket) throws Exception;
 }

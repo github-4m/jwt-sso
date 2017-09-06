@@ -24,6 +24,7 @@ public class Session implements Serializable {
   public static final String COLUMN_USERNAME = "USERNAME";
   public static final String COLUMN_SESSION_ID = "SESSION_ID";
   public static final String COLUMN_HOSTNAME = "HOSTNAME";
+  public static final String COLUMN_TICKET = "TICKET";
 
   @Id
   @Column(name = Session.COLUMN_ID)
@@ -41,6 +42,9 @@ public class Session implements Serializable {
   @Column(name = Session.COLUMN_HOSTNAME, nullable = false)
   private String hostname;
 
+  @Column(name = Session.COLUMN_TICKET, nullable = false)
+  private String ticket;
+
   public Session() {
   }
 
@@ -49,6 +53,11 @@ public class Session implements Serializable {
     this.username = username;
     this.sessionId = sessionId;
     this.hostname = hostname;
+  }
+
+  public Session(String id, String username, String sessionId, String hostname, String ticket) {
+    this(id, username, sessionId, hostname);
+    this.ticket = ticket;
   }
 
   public String getId() {
@@ -83,21 +92,22 @@ public class Session implements Serializable {
     this.hostname = hostname;
   }
 
+  public String getTicket() {
+    return ticket;
+  }
+
+  public void setTicket(String ticket) {
+    this.ticket = ticket;
+  }
+
   @Override
   public String toString() {
-    return "Session{"
-        + "id='"
-        + id
-        + '\''
-        + ", username='"
-        + username
-        + '\''
-        + ", sessionId='"
-        + sessionId
-        + '\''
-        + ", hostname='"
-        + hostname
-        + '\''
-        + '}';
+    return "Session{" +
+        "id='" + id + '\'' +
+        ", username='" + username + '\'' +
+        ", sessionId='" + sessionId + '\'' +
+        ", hostname='" + hostname + '\'' +
+        ", ticket='" + ticket + '\'' +
+        '}';
   }
 }

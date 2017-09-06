@@ -1,15 +1,86 @@
-# jwt-implementation
+# jwt-sso
 
-This is an example project of JWT implementation, this project use spring-boot and java config.
+This is an example project of JWT (JSon Web Token) with SSO (Single Sign On) authentication
 
-You can run this project directly with maven command (mvn spring-boot:run), but don't forget to use postgresql database. You can use other database, but you need to change pom.xml (add/change database dependency) and application.properties (database configuration)
-
-This project has 2 endpoint which ignored by spring-security, login and signup endpoint. You need to signup first, and then you can login with your username
-
-If you want to access other endpoint, please put JWT token (you get that when you login) in "Authorization" header request
-
-Features :
+## Dependencies
+Please make sure your environment have dependecies below :
 <ul>
-<li>CORS Configuration : You can change CORS configuration as you want in FilterConfiguration.corsFilter() method</li>
-<li>Single Session : Last session will kicked if endpoint of login called again. It's not really kicked out, but you can't use old token</li>
+<li>Java (version 8.x or higher)</li>
+<li>Apache Maven (version 3.x.x or higher)</li>
+<li>SQL database (Postgres or others, need to change database driver in project properties if you use others)</li>
+<li>Central Authentication Service</li>
+<li>Java container (e.g. Tomcat, optional)</li>
 </ul>
+
+## Installation and How To Use
+### Installation
+You can choose to use embedded Jetty or others container (e.g. Apache Tomcat) to run the project.
+Please set the value of environment variables below
+```
+JWT_DB_HOST=localhost                             // your database host
+JWT_DB_PORT=5432                                  // your database port
+JWT_DB_NAME=jwt_sso                               // your database name
+JWT_DB_USERNAME=local                             // your database username
+JWT_DB_PASSWORD=local                             // your database password
+
+JWT_CAS_HOST=https://cas.local                    // your CAS host
+JWT_CAS_SERVICE=http://localhost:8080/api/login
+```
+Run the command below inside the project directory
+```
+$ mvn clean spring-boot:run
+```
+or create the .war file then deploy it to others container
+
+### How To Use
+To access all API in this project you should include the token, which generated after login, in request header. Put the token in "Authorization" request header. Some API will ignored from security (no need to include token in request header), e.g. /api/login, /swagger-ui.html
+
+For authorization, you can use @Authorize annotation which placed on controller method, then put your roles in that @Authorize annotation
+```
+...
+@RequestMapping(value = "/api/call", method = RequestMethod.GET)
+@Authorize(roles = {"ROLE"})
+public BaseResponse method(String requestId) throws Exception {
+  ...
+  return new BaseResponse(null, null, true, requestId);
+}
+...
+```
+Don't forget to put user roles in token when user do authentication (id.co.blogspot.fathan.service.user.UserServiceBean)
+```
+...
+@Override
+@Transactional(readOnly = false, rollbackFor = Exception.class)
+public String authenticate(String ticket, HttpServletResponse httpServletResponse) throws Exception {
+  if (StringUtils.isEmpty(ticket)) {
+    this.casOutbound.authenticate(httpServletResponse);
+  }
+  CasAuthenticationSuccess casAuthenticationSuccess = this.casOutbound.validate(ticket);
+  // put your code here :
+  // get user roles after validate ticket to CAS server
+  // then, send user roles to method generateJwtToken
+  this.sessionService.create(casAuthenticationSuccess.getUsername());
+  return this.generateJwtToken(casAuthenticationSuccess.getUsername());
+}
+
+@Override
+public String generateJwtToken(String username) throws Exception {
+  Claims claims = Jwts.claims().setSubject(username);
+  // put your code here :
+  // put user roles in claims object
+  claims.put("sessionId", Credential.getSessionId());
+  return Jwts.builder()
+      .setClaims(claims)
+      .signWith(SignatureAlgorithm.HS512, this.jwtSecretKey)
+      .compact();
+}
+...
+```
+
+## How It Works
+### Authentication
+![alt text](https://lh3.googleusercontent.com/TtdOxSicBd02Ekfu6CvgHvGChtIw8KKQa2eFlwSOeqAdMknIyew4D_5Ali6a9_N2AwtlhdgF9V6MJl5RM3LzsN6dYUDl0oOBNuEXomCoWypvxp_hESBX0EbCJWBflfRGNdWcfuG75Q=w961-h361-no)
+As you can see from authentication sequence diagram above, any authentication process will provided by CAS server (login form and user authentication) and we don't need to manage user data. But we do manage token generation after authentication process and token validation each time our protected API called
+
+### Authorization
+Authorization process in this project using AOP (Aspect Oriented Programming), so when any method which have @Authorization annotation called, it will validate user roles first
